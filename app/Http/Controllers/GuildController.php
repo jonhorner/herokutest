@@ -13,6 +13,6 @@ class GuildController extends BaseController
 
     public function showGuild()
     {
-        return 'Hello'
+        return 'Hello';
     }
 }
