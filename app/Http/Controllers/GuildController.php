@@ -13,6 +13,11 @@ class GuildController extends BaseController
 
     public function showGuild()
     {
-        return 'Hello';
+
+    	$sampleData = [];
+    	$sampleData[] = [ 'id' => 1, 'name' => 'username' ];
+    	$sampleData[] = [ 'id' => 2, 'name' => 'username2' ];
+
+        return json_encode($sampleData);
     }
 }
