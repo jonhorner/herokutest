@@ -18,4 +18,4 @@ Route::get('/', function () {
     //return view('welcome');
 });
 
-Route::get('/guild', [GuildController::class, 'showGuild']);
+Route::get('/api/guild', [GuildController::class, 'showGuild']);
