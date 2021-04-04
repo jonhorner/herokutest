@@ -1,9 +1,9 @@
 {
-    "name": "Swgoh Guild",
+    "name": "laravel/swgohguild",
     "type": "project",
     "description": "",
-    "keywords": [],
-    "license": "",
+    "keywords": ["swgoh"],
+    "license": "non",
     "require": {
         "php": "^7.3|^8.0",
         "fideloper/proxy": "^4.4",
