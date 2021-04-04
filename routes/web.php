@@ -19,3 +19,5 @@ Route::get('/', function () {
 });
 
 Route::get('/api/guild', [GuildController::class, 'showGuild']);
+
+Route::get('/api/update-guild-members', [GuildController::class, 'updateGuidMembers']);
