@@ -30,4 +30,9 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'swgoh_help' => [
+        'user' => env('SWGOH_HELP_USER'),
+        'password' => env('SWGOH_HELP_PASSWORD'),
+    ],
+
 ];
