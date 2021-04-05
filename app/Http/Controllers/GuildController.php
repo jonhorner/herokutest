@@ -11,6 +11,7 @@ use App\Models\SwGuildMember;
 use App\Models\SwGuildMembersRoster;
 use App\Http\Controllers\PlayerController;
 
+use App\Jobs\ProcessGuild;
 use App\Http\Middleware\SwgohHelp;
 
 class GuildController extends BaseController

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GuildController;
+use App\Http\Controllers\UnitController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,7 +20,7 @@ Route::get('/', function () {
 });
 
 Route::get('/api/guild', [GuildController::class, 'showGuild']);
-
+Route::get('/api/guild/all', [GuildController::class, 'getAll']);
 Route::get('/api/update-guild-members', [GuildController::class, 'updateGuidMembers']);
 
 
