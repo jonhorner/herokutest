@@ -33,7 +33,7 @@ class UnitController extends BaseController
 
 
     public function updateUnits(){
-        ProcessGuild::dispatch();
+        UpdateUnits::dispatch();
     }
 
 
