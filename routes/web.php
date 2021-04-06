@@ -24,4 +24,4 @@ Route::get('/api/guild/all', [GuildController::class, 'getAll']);
 Route::get('/api/update-guild-members', [GuildController::class, 'updateGuidMembers']);
 
 
-Route::get('/api/units/all', [UnitController::class, 'getAll']);
+Route::get('/api/units/update', [UnitController::class, 'updateUnits']);
