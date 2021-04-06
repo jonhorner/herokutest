@@ -14,6 +14,7 @@ use App\Models\SwUnitCategoryXrefs;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Client;
 
+use App\Jobs\ProcessGuild;
 use App\Http\Middleware\SwgohHelp;
 
 class UnitController extends BaseController
@@ -30,51 +31,11 @@ class UnitController extends BaseController
         ]);
     }
 
-    private	function getAll(){
 
-        $units = (new SwgohHelp)->getUnitData();
-        $processedUnits = [];
-
-        foreach ($units as $unit) {
-
-            // Filter out event characters
-            if(
-                !strpos($unit['baseId'], '_')
-                || in_array($unit['baseId'], array('L3_37','T3_M4'))
-            ){
-                $unit = SwUnitData::updateOrCreate(
-                    [ 'baseId' => $unit['baseId'] ],
-                    [
-                        'thumbnailName' => $unit['thumbnailName'],
-                        'baseId' => $unit['baseId'],
-                        'nameKey' => $unit['nameKey'],
-                        'combatType' => (int)$unit['combatType']
-                    ]
-                );
-
-                $processedUnits[] = $unit;
-            }
-
-
-        }
-
-
-    	return $processedUnits;
-
-
-        // var_dump($unitData);
-        // return $player[0]['roster'];
-        // foreach ($player[0]['roster'] as $unit) {
-        //     // var_dump($unit['relic']['currentTier']);
-
-        //     if((int)$unit['relic']['currentTier'] > 0){
-        //         $roster[] = $unit['defId'];
-        //     }
-        // }
-
-        // return $unitData;
-
+    public function updateUnits(){
+        ProcessGuild::dispatch();
     }
+
 
     private function getUnitsWithGuzzle(){
 
