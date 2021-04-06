@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SwGuildMembersRoster extends Model
 {
-    protected $connection = 'sqlite';
+    // protected $connection = 'sqlite';
 
     protected $fillable = ['sw_guild_member_id','defId','relic','tier','stars','level'];
 

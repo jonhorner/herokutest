@@ -9,7 +9,7 @@ class SwGuildTokens extends Model
 {
 	use DateScopes;
 
-    protected $connection = 'sqlite';
+    // protected $connection = 'sqlite';
 
     protected $fillable = ['guild_id','allycode','total_tickets'];
 }

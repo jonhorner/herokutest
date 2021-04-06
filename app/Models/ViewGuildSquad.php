@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ViewGuildSquad extends Model
 {
-    protected $connection = 'sqlite';
+    // protected $connection = 'sqlite';
 
     //protected $table = 'view_guild_squad';
 

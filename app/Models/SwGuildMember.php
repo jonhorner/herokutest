@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SwGuildMember extends Model
 {
-    protected $connection = 'sqlite';
+    // protected $connection = 'sqlite';
 
     protected $fillable = ['allyCode','username','active'];
 
