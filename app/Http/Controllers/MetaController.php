@@ -2,41 +2,39 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Support\Facades\View;
 use Revolution\Google\Sheets\Facades\Sheets;
 use App\Models\SwGuildMember;
 use App\Models\SwGuildMembersRoster;
-use App\Http\Controllers\MemberController;
 
 class MetaController extends BaseController
 {
 
-    const GALACTIC_LEGENDS = ['GLREY','SUPREMELEADERKYLOREN','GRANDMASTERLUKE','SITHPALPATINE'];
-    const GALACTIC_LEGENDS_KEY = ['GLREY'=>'REY',
+    public const GALACTIC_LEGENDS = ['GLREY','SUPREMELEADERKYLOREN','GRANDMASTERLUKE','SITHPALPATINE'];
+    public const GALACTIC_LEGENDS_KEY = ['GLREY'=>'REY',
         'SUPREMELEADERKYLOREN'=>'SLKR',
         'GRANDMASTERLUKE' => 'GML',
         'SITHPALPATINE'=>'SEE'
     ];
-    const GAS = 'GENERALSKYWALKER';
-    const JKL = 'JEDIKNIGHTLUKE';
+    public const GAS = 'GENERALSKYWALKER';
+    public const JKL = 'JEDIKNIGHTLUKE';
 
-    private $csv_content;
     private $debug;
 
-    function __construct()
+    public function __construct()
     {
         $this->debug = false;
     }
 
-    public function index()
+    /**
+     * @return JsonResponse
+     */
+    public function index(): JsonResponse
     {
         // Get guild members
         $members = SwGuildMember::where('active','1')->orderBy('username')->get();
-        $this->csv_content = '';
+//        $this->csv_content = '';
 
         $data= [];
         // $headers = [now()->toFormattedDateString(),'GAS','GLs','GL list','Meta Squads','Legendary Squads','Unique Legendary','Most squads','Best squads'];
@@ -101,7 +99,7 @@ class MetaController extends BaseController
                 }
             }
 
-            $this->csv_content .= $member->username.','.$hasGas.','.$hasJkl.','.$hasLegends['count'].','.$hasLegends['list'].','.count($squads).','.count($legendaries).','.$uniqueLegend."<br/>";
+//            $this->csv_content .= $member->username.','.$hasGas.','.$hasJkl.','.$hasLegends['count'].','.$hasLegends['list'].','.count($squads).','.count($legendaries).','.$uniqueLegend."<br/>";
 
             $mostsquads = count($squads);
             $bestsquads = count($squads)+$uniqueLegend;
@@ -117,10 +115,10 @@ class MetaController extends BaseController
         }
 
 
-        return $this->csv_content;
+        return response()->json($data);
     }
 
-    private function sendToSheets($data)
+    private function sendToSheets($data): void
     {
 
         $sheet = Sheets::spreadsheet('1D-baQNmzJNfUBArr7fpQC7m_hPCI7KMnAITHVqJyL9c')
@@ -131,10 +129,10 @@ class MetaController extends BaseController
         // return back();
     }
 
-    private function hasGas($id)
+    private function hasGas($id): string
     {
         $hasGas = SwGuildMembersRoster::where('sw_guild_member_id', $id)
-                    ->where('defId','=', SELF::GAS)->get();
+                    ->where('defId','=', self::GAS)->get();
 
         // var_dump(SELF::GAS);
         // var_dump($hasGas);
@@ -147,10 +145,10 @@ class MetaController extends BaseController
     }
 
 
-     private function hasJkl($id)
-    {
+     private function hasJkl($id): string
+     {
         $hasJkl = SwGuildMembersRoster::where('sw_guild_member_id', $id)
-                    ->where('defId','=', SELF::JKL)->get();
+                    ->where('defId','=', self::JKL)->get();
 
         if((int)$hasJkl->count() === 1){
             return 'Yes';
@@ -159,18 +157,18 @@ class MetaController extends BaseController
         return 'No';
     }
 
-    private function hasLegends($id)
+    private function hasLegends($id): array
     {
         $legends = SwGuildMembersRoster::where('sw_guild_member_id', $id)
-                    ->whereIn('defId', SELF::GALACTIC_LEGENDS)->get('defId');
+                    ->whereIn('defId', self::GALACTIC_LEGENDS)->get('defId');
 
 
         if($legends->count() > 0){
             $legendArr =  $legends->pluck('defId')->toArray();
             $legendArr = array_combine($legendArr,$legendArr);
 
-            $legendArr = array_values(array_intersect_key(SELF::GALACTIC_LEGENDS_KEY,$legendArr));
-            $legendList = implode($legendArr,',');
+            $legendArr = array_values(array_intersect_key(self::GALACTIC_LEGENDS_KEY,$legendArr));
+            $legendList = implode(',', $legendArr);
         }
 
         return array(
