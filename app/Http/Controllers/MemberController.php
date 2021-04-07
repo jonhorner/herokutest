@@ -50,6 +50,15 @@ class MemberController extends BaseController
         return response()->json($members);
     }
 
+     public function getMember($allycode)
+    {
+        $member =  SwGuildMember::where('active','1')
+                                ->where('allycode','=',$allycode)
+                                ->first();
+
+        return response()->json($member);
+    }
+
 	public function getPlayerNameFromDB($allycode)
     {
         $user = SwGuildMember::where('allyCode',$allycode)->first();

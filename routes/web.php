@@ -24,6 +24,7 @@ Route::get('/api/guild', [GuildController::class, 'showGuild']);
 Route::get('/api/guild/all', [GuildController::class, 'getAll']);
 Route::get('/api/update-guild-members', [GuildController::class, 'updateGuidMembers']);
 Route::get('/api/members/all', [MemberController::class, 'getAll']);
+Route::get('/api/members/{allycode}', [MemberController::class, 'getMember']);
 
 
 Route::get('/api/units/update', [UnitController::class, 'updateUnits']);
