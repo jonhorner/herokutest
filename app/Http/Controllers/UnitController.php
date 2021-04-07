@@ -14,7 +14,7 @@ use App\Models\SwUnitCategoryXrefs;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Client;
 
-use App\Jobs\ProcessGuild;
+use App\Jobs\UpdateUnits;
 use App\Http\Middleware\SwgohHelp;
 
 class UnitController extends BaseController
