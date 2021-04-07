@@ -110,8 +110,13 @@ class MetaController extends BaseController
             $data[] = $userData;
         }
 
+
         if(!$this->debug){
-            $this->sendToSheets($data);
+            try {
+                $this->sendToSheets($data);
+            } catch (\Exception $e){
+
+            }
         }
 
 
@@ -125,8 +130,6 @@ class MetaController extends BaseController
                     ->sheet('Overview');
 
         $sheet->update($data);
-
-        // return back();
     }
 
     private function hasGas($id): string
