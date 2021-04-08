@@ -108,14 +108,24 @@ class MetaController extends BaseController
             $bestsquads = count($squads)+$uniqueLegend;
 
             // $userData = [$member->username,$hasGas,$hasLegends['count'],$hasLegends['list'], $mostsquads.' / '.$bestsquads,count($legendaries)];
-            $userData = [$member->username,$hasGas,$hasJkl,$hasLegends['count'],$hasLegends['list'], $mostsquads,count($legendaries)];
+            $userData = [
+                'username' => $member->username,
+                'gas' => $hasGas,
+                'jkl' => $hasJkl,
+                'legendCount' => $hasLegends['count'],
+                'legendList' => $hasLegends['list'],
+                'mostsquads' => $mostsquads,
+                'legendaryCount' => count($legendaries)
+            ];
 
             $data[] = $userData;
         }
 
 
         if ($this->getSendToGoogle()) {
-            $this->sendToSheets($data);
+            $this->sendToSheets(
+                array_values($data)
+            );
         }
         return response()->json($data);
     }
