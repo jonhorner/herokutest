@@ -10,8 +10,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-use App\Http\Middleware\SwgohHelp;
-
 use App\Models\SwUnitData;
 
 class UpdateUnits implements ShouldQueue
@@ -58,13 +56,13 @@ class UpdateUnits implements ShouldQueue
 
         foreach ($units as $unit) {
             // Filter out event characters
-            if(
+            if (
                 !strpos($unit->base_id, '_')
-                || in_array($unit->base_id, array('L3_37','T3_M4'))
-            ){
+                || in_array($unit->base_id, array('L3_37', 'T3_M4'))
+            ) {
                 // get categories - add any which dont exist to the category table
                 $categoryIds = [];
-                if($unit->categories){
+                if ($unit->categories) {
                     foreach ($unit->categories as $value) {
                         $category = SwUnitCategories::firstOrCreate(
                             [
@@ -78,21 +76,21 @@ class UpdateUnits implements ShouldQueue
 
                 // Create or update unit data
                 $unit = SwUnitData::updateOrCreate(
-                    [ 'baseId' => $unit->base_id ],
+                    ['baseId' => $unit->base_id],
                     [
                         //'thumbnailName' => $unit['base_id'],
                         'baseId' => $unit->base_id,
                         'nameKey' => $unit->name,
                         'combatType' => (int)$unit->combat_type,
-                        'categories' => implode(',',$categoryIds)
+                        'categories' => implode(',', $categoryIds)
                     ]
                 );
 
                 // Add cross reference data for unite categories
-                if($categoryIds){
+                if ($categoryIds) {
                     foreach ($categoryIds as $id) {
                         $unit = SwUnitCategoryXrefs::updateOrCreate(
-                            [ 'sw_unit_categories_id' => $id ],
+                            ['sw_unit_categories_id' => $id],
                             [
                                 'sw_unit_data_id' => $unit->id,
                                 'sw_unit_categories_id' => $id
@@ -100,7 +98,7 @@ class UpdateUnits implements ShouldQueue
                         );
                     }
                 }
-
             }
+        }
     }
 }
