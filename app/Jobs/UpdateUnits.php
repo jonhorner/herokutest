@@ -52,8 +52,8 @@ class UpdateUnits implements ShouldQueue
 
                 // get categories - add any which dont exist to the category table
                 $categoryIds = [];
-                if($unit->categories){
-                    foreach ($unit->categories as $value) {
+                if($unit['categories']){
+                    foreach ($unit['categories'] as $value) {
                         $category = SwUnitCategories::firstOrCreate(
                             [
                                 'category' => trim($value)
