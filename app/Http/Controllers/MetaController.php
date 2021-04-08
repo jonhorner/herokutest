@@ -121,7 +121,7 @@ class MetaController extends BaseController
     }
 
 
-    public function googleReport()
+    public function googleReport(): void
     {
         $this->setSendToGoogle(true)
             ->index();
