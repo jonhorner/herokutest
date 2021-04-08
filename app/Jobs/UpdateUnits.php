@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Models\SwUnitCategories;
+use App\Models\SwUnitCategoryXrefs;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -47,15 +49,44 @@ class UpdateUnits implements ShouldQueue
                 !strpos($unit['baseId'], '_')
                 || in_array($unit['baseId'], array('L3_37','T3_M4'))
             ){
+
+                // get categories - add any which dont exist to the category table
+                $categoryIds = [];
+                if($unit->categories){
+                    foreach ($unit->categories as $value) {
+                        $category = SwUnitCategories::firstOrCreate(
+                            [
+                                'category' => trim($value)
+                            ]
+                        );
+
+                        $categoryIds[] = $category->id;
+                    }
+                }
+
                 SwUnitData::updateOrCreate(
                     [ 'baseId' => $unit['baseId'] ],
                     [
                         'thumbnailName' => $unit['thumbnailName'],
                         'baseId' => $unit['baseId'],
                         'nameKey' => $unit['nameKey'],
-                        'combatType' => (int)$unit['combatType']
+                        'combatType' => (int)$unit['combatType'],
+                        'categories' => implode(',',$categoryIds)
                     ]
                 );
+
+                // Add cross reference data for unite categories
+                if($categoryIds){
+                    foreach ($categoryIds as $id) {
+                        $unit = SwUnitCategoryXrefs::updateOrCreate(
+                            [ 'sw_unit_categories_id' => $id ],
+                            [
+                                'sw_unit_data_id' => $unit->id,
+                                'sw_unit_categories_id' => $id
+                            ]
+                        );
+                    }
+                }
             }
         }
     }
