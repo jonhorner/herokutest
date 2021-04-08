@@ -18,6 +18,10 @@ class UpdateUnits implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+
+    public const BASE_URL = 'https://swgoh.gg';
+    public const UNIT_URL = self::BASE_URL.'/api/characters/';
+
     /**
      * Create a new job instance.
      *
@@ -41,19 +45,27 @@ class UpdateUnits implements ShouldQueue
 
     private function getAll(): void
     {
-        $units = (new SwgohHelp)->getUnitData();
+        $client = new Client(); //GuzzleHttp\Client
+        $units = $client->request(
+            'GET',
+            self::UNIT_URL,
+            [
+                'Authorisation' => ['jon.horner@gmail.com','nFYCJ4aft67cCx6nRCzg']
+            ]
+        );
+
+        $units = json_decode($units->getBody()->getContents());
 
         foreach ($units as $unit) {
             // Filter out event characters
             if(
-                !strpos($unit['baseId'], '_')
-                || in_array($unit['baseId'], array('L3_37','T3_M4'))
+                !strpos($unit->base_id, '_')
+                || in_array($unit->base_id, array('L3_37','T3_M4'))
             ){
-
                 // get categories - add any which dont exist to the category table
                 $categoryIds = [];
-                if($unit['categories']){
-                    foreach ($unit['categories'] as $value) {
+                if($unit->categories){
+                    foreach ($unit->categories as $value) {
                         $category = SwUnitCategories::firstOrCreate(
                             [
                                 'category' => trim($value)
@@ -64,13 +76,14 @@ class UpdateUnits implements ShouldQueue
                     }
                 }
 
-                SwUnitData::updateOrCreate(
-                    [ 'baseId' => $unit['baseId'] ],
+                // Create or update unit data
+                $unit = SwUnitData::updateOrCreate(
+                    [ 'baseId' => $unit->base_id ],
                     [
-                        'thumbnailName' => $unit['thumbnailName'],
-                        'baseId' => $unit['baseId'],
-                        'nameKey' => $unit['nameKey'],
-                        'combatType' => (int)$unit['combatType'],
+                        //'thumbnailName' => $unit['base_id'],
+                        'baseId' => $unit->base_id,
+                        'nameKey' => $unit->name,
+                        'combatType' => (int)$unit->combat_type,
                         'categories' => implode(',',$categoryIds)
                     ]
                 );
@@ -87,7 +100,7 @@ class UpdateUnits implements ShouldQueue
                         );
                     }
                 }
+
             }
-        }
     }
 }
