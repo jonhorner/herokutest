@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @method static whereIn(string $string, int[] $array)
+ */
 class ViewGuildSquad extends Model
 {
     // protected $connection = 'sqlite';

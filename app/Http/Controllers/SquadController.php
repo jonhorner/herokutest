@@ -2,32 +2,42 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Redirect;
 use Revolution\Google\Sheets\Facades\Sheets;
 use Illuminate\Http\Request;
-use Illuminate\Routing;
-use Illuminate\Support\Collection;
 
-// use Illuminate\Session;
+
 use App\Models\SwGuildSquad;
 use App\Models\SwGuildMember;
 use App\Models\SwUnitData;
 use App\Models\SwUnitCategories;
 use App\Models\SwGuildMembersRoster;
 use App\Models\ViewGuildSquad;
-use App\Http\Controllers\GuildController;
-use App\Http\Controllers\MemberController;
 
 
 class SquadController extends BaseController
 {
 
     protected $charcterData;
+    protected $squads;
+
+
+    /**
+     * @return JsonResponse
+     */
+    public function getAll(): JsonResponse
+    {
+//        $squads = SwGuildSquad::all();
+        $squads = ViewGuildSquad::all()
+            ->sortBy('ordering')
+            ->sortBy('priority');
+
+        return response()->json($squads);
+    }
 
     public function viewSquads()
     {
@@ -39,7 +49,9 @@ class SquadController extends BaseController
 
     private	function getSquadsFromView(){
 
-        $squads = ViewGuildSquad::all()->sortBy('ordering')->sortBy('priority');
+        $squads = ViewGuildSquad::all()
+            ->sortBy('ordering')
+            ->sortBy('priority');
 
     	return $squads;
     }
@@ -63,7 +75,11 @@ class SquadController extends BaseController
 
     }
 
-    private function generateCharacterSelect($withCategories = true)
+    /**
+     * @param bool $withCategories
+     * @return array
+     */
+    private function generateCharacterSelect($withCategories = true): array
     {
         // $characters = SwUnitData::all();
         $characters = SwUnitData::orderBy('nameKey')->characters()->get();
@@ -85,20 +101,21 @@ class SquadController extends BaseController
     }
 
 
-    public function index()
+    /**
+     * @return View
+     */
+    public function index(): View
     {
-
-        // if($id){
-
-        // }
-
         $squads = $this->getSquadsFromView();
 
-        return View::make('squads.index', [
-            'content' => '',
-            'units' => $squads,
-            'selectdata' => $this->generateCharacterSelect()
-        ]);
+        return View::make(
+            'squads.index',
+            [
+                'content' => '',
+                'units' => $squads,
+                'selectdata' => $this->generateCharacterSelect()
+            ]
+        );
     }
 
     public function showGuildMetaSquads()
@@ -188,7 +205,11 @@ class SquadController extends BaseController
 
     }
 
-    private function createSquadArray($squad)
+    /**
+     * @param $squad
+     * @return array
+     */
+    private function createSquadArray($squad): array
     {
         $data = [];
         $data[] = $squad['name'];
@@ -199,7 +220,10 @@ class SquadController extends BaseController
         return $data;
     }
 
-    private function sendToSheets($data)
+    /**
+     * @param $data
+     */
+    private function sendToSheets($data): void
     {
         $sheet = Sheets::spreadsheet('1D-baQNmzJNfUBArr7fpQC7m_hPCI7KMnAITHVqJyL9c')
                     ->sheet('Squads');
@@ -235,7 +259,11 @@ class SquadController extends BaseController
 
     }
 
-    private function getPlayersWithFullSquad($squad)
+    /**
+     * @param $squad
+     * @return array
+     */
+    private function getPlayersWithFullSquad($squad): array
     {
 
         $guildmembers = (new GuildController)->getGuildMembersFromDB();
@@ -286,9 +314,10 @@ class SquadController extends BaseController
 
     /**
      * $return Response
+     * @param Request $request
+     * @return RedirectResponse
      */
-
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         // validate
         // read more on validation at http://laravel.com/docs/validation
@@ -324,9 +353,11 @@ class SquadController extends BaseController
 
     /**
      * $return Response
+     * @param Request $request
+     * @param $id
+     * @return RedirectResponse
      */
-
-    public function update(Request $request, $id)
+    public function update(Request $request, $id): RedirectResponse
     {
         // validate
         // read more on validation at http://laravel.com/docs/validation
@@ -366,7 +397,7 @@ class SquadController extends BaseController
         * @param  int  $id
         * @return Response
         */
-    public function edit($id)
+    public function edit($id): Response
     {
         $squad = SwGuildSquad::find($id);
 
@@ -376,7 +407,11 @@ class SquadController extends BaseController
         }
 
 
-    public function destroy($id)
+    /**
+     * @param $id
+     * @return RedirectResponse
+     */
+    public function destroy($id): RedirectResponse
     {
         // delete
         $squad = SwGuildSquad::find($id);

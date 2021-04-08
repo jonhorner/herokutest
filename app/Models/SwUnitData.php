@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @method static updateOrCreate(array $array, array $array1)
+ * @method static orderBy(string $string)
  */
 class SwUnitData extends Model
 {

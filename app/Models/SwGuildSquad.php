@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @method static whereNotIn(string $string, int[] $array)
  * @method static whereIn(string $string, array|mixed $priority)
+ * @method static find($id)
  */
 class SwGuildSquad extends Model
 {

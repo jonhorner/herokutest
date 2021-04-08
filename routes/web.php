@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\MetaController;
+use App\Http\Controllers\SquadController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GuildController;
 use App\Http\Controllers\UnitController;
@@ -29,3 +30,9 @@ Route::get('/api/members/{allycode}', [MemberController::class, 'getMember']);
 Route::get('/api/units/update', [UnitController::class, 'updateUnits']);
 
 Route::get('/api/report', [MetaController::class, 'index']);
+
+Route::get('/api/meta-squads', [SquadController::class, 'getAll']);
+Route::get('/guild-squad-report', [SquadController::class, 'showGuildMetaSquads']);
+Route::put('/api/squad-builder', [SquadController::class, 'store']);
+Route::delete('/api/squad-builder/{id}', [SquadController::class, 'destroy']);
+
