@@ -21,10 +21,13 @@ class MetaController extends BaseController
     public const JKL = 'JEDIKNIGHTLUKE';
 
     private $debug;
+    private $sendToGoogle;
 
     public function __construct()
     {
-        $this->debug = false;
+        $this->setDebug(false)
+             ->setSendToGoogle(false);
+
     }
 
     /**
@@ -111,16 +114,19 @@ class MetaController extends BaseController
         }
 
 
-        if(!$this->debug){
-//            try {
-                $this->sendToSheets($data);
-//            } catch (\Exception $e){
-//
-//            }
+        if ($this->getSendToGoogle()) {
+            $this->sendToSheets($data);
         }
-
         return response()->json($data);
     }
+
+
+    public function googleReport()
+    {
+        $this->setSendToGoogle(true)
+            ->index();
+    }
+
 
     private function sendToSheets($data): void
     {
@@ -180,5 +186,34 @@ class MetaController extends BaseController
     // {
 
     // }
+    /**
+     * @param mixed $sendToGoogle
+     * @return MetaController
+     */
+    public function setSendToGoogle($sendToGoogle): MetaController
+    {
+        $this->sendToGoogle = $sendToGoogle;
+
+        return $this;
+    }
+
+    /**
+     * @param false $debug
+     * @return MetaController
+     */
+    public function setDebug(bool $debug): MetaController
+    {
+        $this->debug = $debug;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSendToGoogle()
+    {
+        return $this->sendToGoogle;
+    }
 
 }

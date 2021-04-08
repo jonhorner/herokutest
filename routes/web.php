@@ -30,6 +30,7 @@ Route::get('/api/members/{allycode}', [MemberController::class, 'getMember']);
 Route::get('/api/units/update', [UnitController::class, 'updateUnits']);
 
 Route::get('/api/report', [MetaController::class, 'index']);
+Route::get('/api/google-report', [MetaController::class, 'googleReport']);
 
 Route::get('/api/meta-squads', [SquadController::class, 'getAll']);
 Route::get('/guild-squad-report', [SquadController::class, 'showGuildMetaSquads']);
