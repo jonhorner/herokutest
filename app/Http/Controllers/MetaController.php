@@ -112,13 +112,12 @@ class MetaController extends BaseController
 
 
         if(!$this->debug){
-            try {
+//            try {
                 $this->sendToSheets($data);
-            } catch (\Exception $e){
-
-            }
+//            } catch (\Exception $e){
+//
+//            }
         }
-
 
         return response()->json($data);
     }
@@ -136,9 +135,6 @@ class MetaController extends BaseController
     {
         $hasGas = SwGuildMembersRoster::where('sw_guild_member_id', $id)
                     ->where('defId','=', self::GAS)->get();
-
-        // var_dump(SELF::GAS);
-        // var_dump($hasGas);
 
         if((int)$hasGas->count() === 1){
             return 'Yes';
