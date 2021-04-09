@@ -27,6 +27,7 @@ class MetaController extends BaseController
     public function __construct()
     {
         $this->setDebug(false)
+            ->setUseKeys(false)
              ->setSendToGoogle(false);
 
     }
@@ -42,10 +43,18 @@ class MetaController extends BaseController
 
         $data= [];
         // $headers = [now()->toFormattedDateString(),'GAS','GLs','GL list','Meta Squads','Legendary Squads','Unique Legendary','Most squads','Best squads'];
-        $headers = [now()->toFormattedDateString(),'GAS','JKL','GLs','GL list','Meta Squads','Legendary Squads',];
+        $headers = [
+            now()->toFormattedDateString(),
+            'GAS',
+            'JKL',
+            'GLs',
+            'GL list',
+            'Meta Squads',
+            'Legendary Squads'
+        ];
         $data[] = $headers;
-        foreach ($members as $member) {
 
+        foreach ($members as $member) {
             // Do they have GAS?
             $hasGas = $this->hasGas($member->id);
 
@@ -108,7 +117,7 @@ class MetaController extends BaseController
             $mostsquads = count($squads);
 //            $bestsquads = count($squads)+$uniqueLegend;
 
-            if ($this->getUseKeys()){
+            if ($this->getUseKeys() !== true){
                 $userData = [
                     $member->username,
                     $hasGas,
@@ -143,6 +152,12 @@ class MetaController extends BaseController
         return response()->json($data);
     }
 
+
+    public function getReport(): void
+    {
+        $this->setUseKeys(true)
+            ->index();
+    }
 
     public function googleReport(): void
     {
