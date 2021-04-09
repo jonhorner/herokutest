@@ -22,6 +22,7 @@ class MetaController extends BaseController
 
     private $debug;
     private $sendToGoogle;
+    private $useKeys;
 
     public function __construct()
     {
@@ -105,25 +106,36 @@ class MetaController extends BaseController
 //            $this->csv_content .= $member->username.','.$hasGas.','.$hasJkl.','.$hasLegends['count'].','.$hasLegends['list'].','.count($squads).','.count($legendaries).','.$uniqueLegend."<br/>";
 
             $mostsquads = count($squads);
-            $bestsquads = count($squads)+$uniqueLegend;
+//            $bestsquads = count($squads)+$uniqueLegend;
 
-            // $userData = [$member->username,$hasGas,$hasLegends['count'],$hasLegends['list'], $mostsquads.' / '.$bestsquads,count($legendaries)];
-            $userData = [
-                'username' => $member->username,
-                'gas' => $hasGas,
-                'jkl' => $hasJkl,
-                'legendCount' => $hasLegends['count'],
-                'legendList' => $hasLegends['list'],
-                'mostsquads' => $mostsquads,
-                'legendaryCount' => count($legendaries)
-            ];
+            if ($this->getUseKeys()){
+                $userData = [
+                    $member->username,
+                    $hasGas,
+                    $hasJkl,
+                    $hasLegends['count'],
+                    $hasLegends['list'],
+                    $mostsquads,
+                    count($legendaries)
+                ];
+            } else {
+                $userData = [
+                    'username' => $member->username,
+                    'gas' => $hasGas,
+                    'jkl' => $hasJkl,
+                    'legendCount' => $hasLegends['count'],
+                    'legendList' => $hasLegends['list'],
+                    'mostsquads' => $mostsquads,
+                    'legendaryCount' => count($legendaries)
+                ];
+            }
 
             $data[] = $userData;
         }
 
 
         if ($this->getSendToGoogle()) {
-            $sheetData = array_values($data);
+            $sheetData = $this->getUseKeys() === true ? array_values($data) : $data;
             $this->sendToSheets(
                 array_values($sheetData)
             );
@@ -135,6 +147,13 @@ class MetaController extends BaseController
     public function googleReport(): void
     {
         $this->setSendToGoogle(true)
+            ->index();
+    }
+
+    public function googleReportWithKeys(): void
+    {
+        $this->setSendToGoogle(true)
+            ->setUseKeys(true)
             ->index();
     }
 
@@ -225,6 +244,24 @@ class MetaController extends BaseController
     public function getSendToGoogle()
     {
         return $this->sendToGoogle;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUseKeys()
+    {
+        return $this->useKeys;
+    }
+
+    /**
+     * @param mixed $useKeys
+     * @return MetaController
+     */
+    public function setUseKeys($useKeys): MetaController
+    {
+        $this->useKeys = $useKeys;
+        return $this;
     }
 
 }
