@@ -123,8 +123,9 @@ class MetaController extends BaseController
 
 
         if ($this->getSendToGoogle()) {
+            $sheetData = array_values($data);
             $this->sendToSheets(
-                array_values($data)
+                array_values($sheetData)
             );
         }
         return response()->json($data);
