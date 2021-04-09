@@ -149,10 +149,10 @@ class SquadController extends BaseController
             $data[] = [$member->username,'','','','',''];
 
             if(isset($squads) && !empty($squads)){
-                $content .= View::make('guild.guild-squadrow-csv', [
-                    'squads'   => $squads,
-                ]);
-                $content .= '<br/>';
+//                $content .= View::make('guild.guild-squadrow-csv', [
+//                    'squads'   => $squads,
+//                ]);
+//                $content .= '<br/>';
 
                 foreach ($squads as $squad) {
                     $data[] = $this->createSquadArray($squad);
@@ -174,10 +174,10 @@ class SquadController extends BaseController
                     if($intersect->count() === 0){
                         $data[] = $this->createSquadArray($legendary);
 
-                    $content .= View::make('guild.guild-squadrow-csv', [
-                                    'squads'   => $legendaries,
-                                ]);
-                    $content .= '<br/>';
+//                    $content .= View::make('guild.guild-squadrow-csv', [
+//                                    'squads'   => $legendaries,
+//                                ]);
+//                    $content .= '<br/>';
                     }
                 }
 
@@ -198,10 +198,10 @@ class SquadController extends BaseController
 
         $this->sendToSheets($data);
 
-        return View::make('guild.metasquads', [
-            'content'   => $content,
-            'recommended' => $recommendedSquads,
-        ]);
+//        return View::make('guild.metasquads', [
+//            'content'   => $content,
+//            'recommended' => $recommendedSquads,
+//        ]);
 
     }
 

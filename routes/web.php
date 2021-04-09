@@ -33,6 +33,9 @@ Route::get('/api/report', [MetaController::class, 'getReport']);
 Route::get('/api/google-report', [MetaController::class, 'googleReport']);
 Route::get('/api/google-report-with-keys', [MetaController::class, 'googleReportWithKeys']);
 
+Route::get('/api/report/squads', [SquadController::class, 'showGuildMetaSquads']);
+
+
 Route::get('/api/meta-squads', [SquadController::class, 'getAll']);
 Route::get('/guild-squad-report', [SquadController::class, 'showGuildMetaSquads']);
 Route::put('/api/squad-builder', [SquadController::class, 'store']);
