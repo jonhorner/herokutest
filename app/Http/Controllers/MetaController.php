@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller as BaseController;
 use Revolution\Google\Sheets\Facades\Sheets;
@@ -35,23 +36,52 @@ class MetaController extends BaseController
     /**
      * @return JsonResponse
      */
-    public function index(): JsonResponse
+    public function returnReport(): JsonResponse
     {
         // Get guild members
-        $members = SwGuildMember::where('active','1')->orderBy('username')->get();
-//        $this->csv_content = '';
+        try {
+            $members = SwGuildMember::where('active','1')
+                ->orderBy('username')
+                ->get();
+
+            if (empty($members->count())) {
+                throw new Exception('No guild members found',400);
+            }
+        } catch (Exception $e) {
+            $return = [
+                'message' => $e->getMessage(),
+                'code' => $e->getCode()
+            ];
+
+            return response()->json($return);
+        }
+
 
         $data= [];
         // $headers = [now()->toFormattedDateString(),'GAS','GLs','GL list','Meta Squads','Legendary Squads','Unique Legendary','Most squads','Best squads'];
-        $headers = [
-            now()->toFormattedDateString(),
-            'GAS',
-            'JKL',
-            'GLs',
-            'GL list',
-            'Meta Squads',
-            'Legendary Squads'
-        ];
+
+        if ($this->getUseKeys() !== true){
+            $headers = [
+                now()->toFormattedDateString(),
+                'GAS',
+                'JKL',
+                'GLs',
+                'GL list',
+                'Meta Squads',
+                'Legendary Squads'
+            ];
+        } else {
+            $headers = [
+                'username' => now()->toFormattedDateString(),
+                'gas' => 'GAS',
+                'jkl' => 'JKL',
+                'legendCount' =>'GLs',
+                'legendList' => 'GL list',
+                'mostsquads' => 'Meta Squads',
+                'legendaryCount' => 'Legendary Squads'
+            ];
+        }
+
         $data[] = $headers;
 
         foreach ($members as $member) {
@@ -153,23 +183,34 @@ class MetaController extends BaseController
     }
 
 
-    public function getReport(): void
+    /**
+     * @return JsonResponse
+     */
+    public function getReport(): JsonResponse
     {
-        $this->setUseKeys(true)
-            ->index();
+        return $this->setUseKeys(true)
+            ->setSendToGoogle(false)
+            ->returnReport();
     }
 
-    public function googleReport(): void
+    /**
+     * @return JsonResponse
+     */
+    public function googleReport(): JsonResponse
     {
-        $this->setSendToGoogle(true)
-            ->index();
+        return $this->setSendToGoogle(true)
+            ->setUseKeys(false)
+            ->returnReport();
     }
 
-    public function googleReportWithKeys(): void
+    /**
+     * @return JsonResponse
+     */
+    public function googleReportWithKeys(): JsonResponse
     {
-        $this->setSendToGoogle(true)
+        return $this->setSendToGoogle(true)
             ->setUseKeys(true)
-            ->index();
+            ->returnReport();
     }
 
 

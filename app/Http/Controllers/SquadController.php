@@ -24,6 +24,16 @@ class SquadController extends BaseController
 
     protected $charcterData;
     protected $squads;
+    protected $submitToGoogle;
+
+    /**
+     * SquadController constructor.
+     * @param $submitToGoogle
+     */
+    public function __construct()
+    {
+        $this->submitToGoogle = false;
+    }
 
 
     /**
@@ -54,6 +64,25 @@ class SquadController extends BaseController
             ->sortBy('priority');
 
     	return $squads;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSubmitToGoogle()
+    {
+        return $this->submitToGoogle;
+    }
+
+    /**
+     * @param mixed $submitToGoogle
+     * @return SquadController
+     */
+    public function setSubmitToGoogle($submitToGoogle): SquadController
+    {
+        $this->submitToGoogle = $submitToGoogle;
+
+        return $this;
     }
 
     private function getLegendarySquadsFromView(){
@@ -118,9 +147,34 @@ class SquadController extends BaseController
         );
     }
 
-    public function showGuildMetaSquads()
+
+    /**
+     * @return JsonResponse
+     */
+    public function submitGuildMetaSquadsToGoogle(): JsonResponse
     {
-        $members = SwGuildMember::where('active','1')->orderBy('username')->get();
+        return $this->setSubmitToGoogle(true)
+            ->getGuildMetaSquads();
+    }
+
+
+    /**
+     * @return JsonResponse
+     */
+    public function returnGuildMetaSquads(): JsonResponse
+    {
+        return $this->setSubmitToGoogle(false)
+            ->getGuildMetaSquads();
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function getGuildMetaSquads(): JsonResponse
+    {
+        $members = SwGuildMember::where('active','1')
+            ->orderBy('username')
+            ->get();
         // $members = SwGuildMember::where('id', 3);
         $content = '';
         $recommendedSquads = '';
@@ -149,10 +203,6 @@ class SquadController extends BaseController
             $data[] = [$member->username,'','','','',''];
 
             if(isset($squads) && !empty($squads)){
-//                $content .= View::make('guild.guild-squadrow-csv', [
-//                    'squads'   => $squads,
-//                ]);
-//                $content .= '<br/>';
 
                 foreach ($squads as $squad) {
                     $data[] = $this->createSquadArray($squad);
@@ -194,15 +244,11 @@ class SquadController extends BaseController
             $data[] = ['','','','','',''];
         }
 
+        if ($this->getSubmitToGoogle() === true){
+            $this->sendToSheets($data);
+        }
 
-
-        $this->sendToSheets($data);
-
-//        return View::make('guild.metasquads', [
-//            'content'   => $content,
-//            'recommended' => $recommendedSquads,
-//        ]);
-
+        return response()->json();
     }
 
     /**

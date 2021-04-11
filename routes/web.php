@@ -30,14 +30,15 @@ Route::get('/api/members/{allycode}', [MemberController::class, 'getMember']);
 Route::get('/api/units/update', [UnitController::class, 'updateUnits']);
 
 Route::get('/api/report', [MetaController::class, 'getReport']);
-Route::get('/api/google-report', [MetaController::class, 'googleReport']);
-Route::get('/api/google-report-with-keys', [MetaController::class, 'googleReportWithKeys']);
+Route::get('/api/report/google-report', [MetaController::class, 'googleReport']);
+Route::get('/api/report/google-report-with-keys', [MetaController::class, 'googleReportWithKeys']);
 
-Route::get('/api/report/squads', [SquadController::class, 'showGuildMetaSquads']);
+Route::get('/api/report/squads', [SquadController::class, 'returnGuildMetaSquads']);
+Route::get('/api/report/google-squad-report', [SquadController::class, 'submitGuildMetaSquadsToGoogle']);
 
 
 Route::get('/api/meta-squads', [SquadController::class, 'getAll']);
-Route::get('/guild-squad-report', [SquadController::class, 'showGuildMetaSquads']);
+//Route::get('/guild-squad-report', [SquadController::class, 'returnGuildMetaSquads']);
 Route::put('/api/squad-builder', [SquadController::class, 'store']);
 Route::delete('/api/squad-builder/{id}', [SquadController::class, 'destroy']);
 
