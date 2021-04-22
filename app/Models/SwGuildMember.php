@@ -13,6 +13,12 @@ class SwGuildMember extends Model
 
     protected $fillable = ['allyCode','username','active'];
 
+
+    protected $casts = [
+        'updated_at' => 'datetime:d-m-Y',
+    ];
+
+
     public function units()
     {
     	return $this->hasMany('App\Unit');
