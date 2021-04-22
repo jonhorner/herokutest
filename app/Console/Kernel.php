@@ -30,6 +30,16 @@ class Kernel extends ConsoleKernel
             return Cron::shouldIRun('updateGuild', 60);
             //returns true every hour
         });
+
+        $schedule->command('googleReport')->everyMinute()->when(function() {
+            return Cron::shouldIRun('googleReport', 60);
+            //returns true every hour
+        });
+
+        $schedule->command('squadReport')->everyMinute()->when(function() {
+            return Cron::shouldIRun('squadReport', 60);
+            //returns true every hour
+        });
     }
 
     /**

@@ -22,3 +22,11 @@ Artisan::command('inspire', function () {
 Artisan::command('updateGuild', function () {
     $this->comment((new App\Http\Controllers\GuildController)->updateGuidMembers());
 })->purpose('update guild');
+
+Artisan::command('googleReport', function () {
+    $this->comment((new App\Http\Controllers\MetaController())->googleReport());
+})->purpose('Generate meta report');
+
+Artisan::command('squadReport', function () {
+    $this->comment((new App\Http\Controllers\SquadController())->submitGuildMetaSquadsToGoogle());
+})->purpose('Generate squad report');
