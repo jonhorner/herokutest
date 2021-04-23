@@ -24,9 +24,9 @@ Artisan::command('updateGuild', function () {
 })->purpose('update guild');
 
 Artisan::command('googleReport', function () {
-    $this->comment((new App\Http\Controllers\MetaController())->googleReport());
+    $this->comment((new App\Http\Controllers\MetaController)->googleReport());
 })->purpose('Generate meta report');
 
 Artisan::command('squadReport', function () {
-    $this->comment((new App\Http\Controllers\SquadController())->submitGuildMetaSquadsToGoogle());
+    $this->comment((new App\Http\Controllers\SquadController)->submitGuildMetaSquadsToGoogle());
 })->purpose('Generate squad report');
