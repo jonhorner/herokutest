@@ -24,19 +24,22 @@ class MetaController extends BaseController
     private $debug;
     private $sendToGoogle;
     private $useKeys;
+    private $isCron;
 
     public function __construct()
     {
         $this->setDebug(false)
             ->setUseKeys(false)
+            ->setIsCron(false)
              ->setSendToGoogle(false);
 
     }
 
+
     /**
-     * @return JsonResponse
+     * @return JsonResponse|null
      */
-    public function returnReport(): JsonResponse
+    public function returnReport(): ?JsonResponse
     {
         // Get guild members
         try {
@@ -179,7 +182,12 @@ class MetaController extends BaseController
                 array_values($sheetData)
             );
         }
-        return response()->json($data);
+
+        if (!$this->getIsCron()){
+            return response()->json($data);
+        }
+
+        return null;
     }
 
 
@@ -200,6 +208,18 @@ class MetaController extends BaseController
     {
         return $this->setSendToGoogle(true)
             ->setUseKeys(false)
+            ->returnReport();
+    }
+
+
+    /**
+     * @return JsonResponse|null
+     */
+    public function googleReportCron(): ?JsonResponse
+    {
+        return $this->setSendToGoogle(true)
+            ->setUseKeys(false)
+            ->setIsCron(true)
             ->returnReport();
     }
 
@@ -317,6 +337,24 @@ class MetaController extends BaseController
     public function setUseKeys($useKeys): MetaController
     {
         $this->useKeys = $useKeys;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIsCron()
+    {
+        return $this->isCron;
+    }
+
+    /**
+     * @param mixed $isCron
+     */
+    public function setIsCron($isCron): MetaController
+    {
+        $this->isCron = $isCron;
+
         return $this;
     }
 

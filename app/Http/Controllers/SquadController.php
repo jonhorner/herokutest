@@ -25,6 +25,7 @@ class SquadController extends BaseController
     protected $charcterData;
     protected $squads;
     protected $submitToGoogle;
+    protected $isCron;
 
     /**
      * SquadController constructor.
@@ -32,7 +33,8 @@ class SquadController extends BaseController
      */
     public function __construct()
     {
-        $this->submitToGoogle = false;
+        $this->setSubmitToGoogle(false)
+            ->setIsCron(false);
     }
 
 
@@ -47,6 +49,30 @@ class SquadController extends BaseController
             ->sortBy('priority');
 
         return response()->json($squads);
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function getOne($id): JsonResponse
+    {
+        try {
+            $squad = SwGuildSquad::where('id', $id)->first();
+        } catch (\Throwable $e){
+            return response()->json($e);
+        }
+
+        if (!empty($squad)) {
+            return response()->json($squad);
+        }
+
+        return response()->json(
+            [
+                ['status' => 'Error'],
+                ['message' => 'Could not fnd team']
+            ]
+        );
     }
 
     public function viewSquads()
@@ -81,6 +107,25 @@ class SquadController extends BaseController
     public function setSubmitToGoogle($submitToGoogle): SquadController
     {
         $this->submitToGoogle = $submitToGoogle;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIsCron()
+    {
+        return $this->isCron;
+    }
+
+    /**
+     * @param mixed $isCron
+     * @return SquadController
+     */
+    public function setIsCron($isCron): SquadController
+    {
+        $this->isCron = $isCron;
 
         return $this;
     }
@@ -157,6 +202,17 @@ class SquadController extends BaseController
             ->getGuildMetaSquads();
     }
 
+    /**
+     * @return JsonResponse
+     */
+    public function submitGuildMetaSquadsToGoogleCron(): JsonResponse
+    {
+        return $this->setSubmitToGoogle(true)
+            ->setIsCron(true)
+            ->getGuildMetaSquads();
+    }
+
+
 
     /**
      * @return JsonResponse
@@ -168,9 +224,9 @@ class SquadController extends BaseController
     }
 
     /**
-     * @return JsonResponse
+     * @return JsonResponse|null
      */
-    public function getGuildMetaSquads(): JsonResponse
+    public function getGuildMetaSquads(): ?JsonResponse
     {
         $members = SwGuildMember::where('active','1')
             ->orderBy('username')
@@ -248,7 +304,11 @@ class SquadController extends BaseController
             $this->sendToSheets($data);
         }
 
+        if ($this->getIsCron() === true){
         return response()->json();
+    }
+
+        return null;
     }
 
     /**

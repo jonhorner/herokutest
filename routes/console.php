@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\GuildController;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 
@@ -15,18 +14,18 @@ use Illuminate\Support\Facades\Artisan;
 |
 */
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+//Artisan::command('inspire', function () {
+//    $this->comment(Inspiring::quote());
+//})->purpose('Display an inspiring quote');
 
 Artisan::command('updateGuild', function () {
     $this->comment((new App\Http\Controllers\GuildController)->updateGuidMembers());
 })->purpose('update guild');
 
 Artisan::command('googleReport', function () {
-    $this->comment((new App\Http\Controllers\MetaController)->googleReport());
+    $this->comment((new App\Http\Controllers\MetaController)->googleReportCron());
 })->purpose('Generate meta report');
 
 Artisan::command('squadReport', function () {
-    $this->comment((new App\Http\Controllers\SquadController)->submitGuildMetaSquadsToGoogle());
+    $this->comment((new App\Http\Controllers\SquadController)->submitGuildMetaSquadsToGoogleCron());
 })->purpose('Generate squad report');
