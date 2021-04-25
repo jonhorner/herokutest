@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Constants\Constants;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\View;
@@ -135,7 +136,10 @@ class MemberController extends BaseController
     public function getGuildMembersRelicSquads($allycode)
     {
 
-        $squads = SwGuildSquad::orderBy('priority')->orderBy('ordering')->get();
+        $squads = SwGuildSquad::ofType(Constants::ID_META_SQUAD)
+            ->orderBy('priority')
+            ->orderBy('ordering')
+            ->get();
         $roster = $this->getMetaRosterFromDB($this->member_id);
 
         [$squads, $removed] = $this->selectUniqueSquads($squads, $roster);
@@ -150,7 +154,8 @@ class MemberController extends BaseController
     public function getGuildMembersNonLegendarySquads($allycode)
     {
 
-        $squads = SwGuildSquad::whereNotIn('priority',[1,2,3])
+        $squads = SwGuildSquad::ofType(Constants::ID_META_SQUAD)
+                    ->whereNotIn('priority',[1,2,3])
                     ->orderBy('priority')
                     ->orderBy('ordering')
                     ->get();
@@ -196,7 +201,8 @@ class MemberController extends BaseController
             dd('no priority set');
         }
 
-        $squads = SwGuildSquad::whereIn('priority',$priority)
+        $squads = SwGuildSquad::ofType(Constants::ID_META_SQUAD)
+                    ->whereIn('priority', $priority)
                     ->orderBy('priority')
                     ->orderBy('ordering')
                     ->get();
@@ -449,7 +455,10 @@ class MemberController extends BaseController
 
     public function getRecommendedSquadFarms($allycode)
     {
-        $squads = SwGuildSquad::orderBy('priority')->orderBy('ordering')->get();
+        $squads = SwGuildSquad::ofType(Constants::ID_META_SQUAD)
+            ->orderBy('priority')
+            ->orderBy('ordering')
+            ->get();
         $roster = $this->getGuildMembersNonMetaSquadToons($allycode);
 
         return $this->selectSquads($squads, $roster, $minGearLevel=13, $minToons=3);

@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Constants\Constants;
+use App\Jobs\GoogleMetaReport;
+use App\Traits\MetaReportTrait;
 use Exception;
+use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller as BaseController;
 use Revolution\Google\Sheets\Facades\Sheets;
@@ -11,33 +15,20 @@ use App\Models\SwGuildMembersRoster;
 
 class MetaController extends BaseController
 {
-
-    public const GALACTIC_LEGENDS = ['GLREY','SUPREMELEADERKYLOREN','GRANDMASTERLUKE','SITHPALPATINE'];
-    public const GALACTIC_LEGENDS_KEY = ['GLREY'=>'REY',
-        'SUPREMELEADERKYLOREN'=>'SLKR',
-        'GRANDMASTERLUKE' => 'GML',
-        'SITHPALPATINE'=>'SEE'
-    ];
-    public const GAS = 'GENERALSKYWALKER';
-    public const JKL = 'JEDIKNIGHTLUKE';
-
-    private $debug;
-    private $sendToGoogle;
-    private $useKeys;
-    private $isCron;
+    use MetaReportTrait;
 
     public function __construct()
     {
         $this->setDebug(false)
             ->setUseKeys(false)
             ->setIsCron(false)
-             ->setSendToGoogle(false);
-
+            ->setSendToGoogle(false);
     }
 
 
     /**
      * @return JsonResponse|null
+     * @deprecated Use Job GoogleMetaReport
      */
     public function returnReport(): ?JsonResponse
     {
@@ -201,65 +192,70 @@ class MetaController extends BaseController
             ->returnReport();
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function googleReport(): JsonResponse
+
+    public function googleReport()
     {
-        return $this->setSendToGoogle(true)
-            ->setUseKeys(false)
-            ->returnReport();
+        /*
+         * @param bool $debug
+         * @param bool $useKeys
+         * @param bool $isCron
+         * @param bool $sendToGoogle
+         */
+        GoogleMetaReport::dispatch(false, false, false, false);
     }
 
-
-    /**
-     * @return JsonResponse|null
-     */
-    public function googleReportCron(): ?JsonResponse
+    public function googleReportCron()
     {
-        return $this->setSendToGoogle(true)
-            ->setUseKeys(false)
-            ->setIsCron(true)
-            ->returnReport();
+        GoogleMetaReport::dispatch(false, false, true, true);
     }
 
     /**
      * @return JsonResponse
      */
-    public function googleReportWithKeys(): JsonResponse
+    public function googleReportWithKeys()
     {
-        return $this->setSendToGoogle(true)
-            ->setUseKeys(true)
-            ->returnReport();
+        GoogleMetaReport::dispatch(false, true, false, true);
     }
 
 
-    private function sendToSheets($data): void
+    /**
+     * @param $data
+     * @deprecated Moved to Trait
+     */
+    public function sendToSheets($data): void
     {
-
         $sheet = Sheets::spreadsheet('1D-baQNmzJNfUBArr7fpQC7m_hPCI7KMnAITHVqJyL9c')
                     ->sheet('Overview');
 
         $sheet->update($data);
     }
 
+    /**
+     * @param $id
+     * @return string
+     * @deprecated Moved to Trait
+     */
     private function hasGas($id): string
     {
         $hasGas = SwGuildMembersRoster::where('sw_guild_member_id', $id)
-                    ->where('defId','=', self::GAS)->get();
+                    ->where('defId','=', Constants::GAS)->get();
 
-        if((int)$hasGas->count() === 1){
+        if ((int) $hasGas->count() === 1) {
             return 'Yes';
         }
 
         return 'No';
     }
 
-
-     private function hasJkl($id): string
+    /**
+     * @param $id
+     * @return string
+     * @deprecated Moved to Trait
+     */
+    private function hasJkl($id): string
      {
         $hasJkl = SwGuildMembersRoster::where('sw_guild_member_id', $id)
-                    ->where('defId','=', self::JKL)->get();
+                    ->where('defId','=', Constants::JKL)->get();
 
         if((int)$hasJkl->count() === 1){
             return 'Yes';
@@ -268,17 +264,22 @@ class MetaController extends BaseController
         return 'No';
     }
 
+    /**
+     * @param $id
+     * @return array
+     * @deprecated Moved to Trait
+     */
     private function hasLegends($id): array
     {
         $legends = SwGuildMembersRoster::where('sw_guild_member_id', $id)
-                    ->whereIn('defId', self::GALACTIC_LEGENDS)->get('defId');
+                    ->whereIn('defId', Constants::GALACTIC_LEGENDS)->get('defId');
 
 
         if($legends->count() > 0){
             $legendArr =  $legends->pluck('defId')->toArray();
             $legendArr = array_combine($legendArr,$legendArr);
 
-            $legendArr = array_values(array_intersect_key(self::GALACTIC_LEGENDS_KEY,$legendArr));
+            $legendArr = array_values(array_intersect_key(Constants::GALACTIC_LEGENDS_KEY,$legendArr));
             $legendList = implode(',', $legendArr);
         }
 
