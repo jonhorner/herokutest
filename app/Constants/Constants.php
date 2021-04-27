@@ -25,4 +25,10 @@ class Constants
     ];
     public const GAS = 'GENERALSKYWALKER';
     public const JKL = 'JEDIKNIGHTLUKE';
+
+    /**
+     * Google sheets
+     */
+    public const ID_GOOGLE_SHEET = '1D-baQNmzJNfUBArr7fpQC7m_hPCI7KMnAITHVqJyL9c';
+    public const NAME_SQUAD_SHEET = 'Squads';
 }

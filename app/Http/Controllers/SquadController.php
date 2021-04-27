@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Constants\Constants;
+use App\Jobs\SquadReportJob;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller as BaseController;
@@ -10,6 +12,7 @@ use Illuminate\Support\Facades\Redirect;
 use Revolution\Google\Sheets\Facades\Sheets;
 use Illuminate\Http\Request;
 
+use App\Traits\SquadReportTrait;
 
 use App\Models\SwGuildSquad;
 use App\Models\SwGuildMember;
@@ -21,11 +24,10 @@ use App\Models\ViewGuildSquad;
 
 class SquadController extends BaseController
 {
+    use SquadReportTrait;
 
     protected $charcterData;
     protected $squads;
-    protected $submitToGoogle;
-    protected $isCron;
 
     /**
      * SquadController constructor.
@@ -33,7 +35,7 @@ class SquadController extends BaseController
      */
     public function __construct()
     {
-        $this->setSubmitToGoogle(false)
+        $this->setSendToGoogle(false)
             ->setIsCron(false);
     }
 
@@ -90,44 +92,6 @@ class SquadController extends BaseController
             ->sortBy('priority');
 
     	return $squads;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getSubmitToGoogle()
-    {
-        return $this->submitToGoogle;
-    }
-
-    /**
-     * @param mixed $submitToGoogle
-     * @return SquadController
-     */
-    public function setSubmitToGoogle($submitToGoogle): SquadController
-    {
-        $this->submitToGoogle = $submitToGoogle;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getIsCron()
-    {
-        return $this->isCron;
-    }
-
-    /**
-     * @param mixed $isCron
-     * @return SquadController
-     */
-    public function setIsCron($isCron): SquadController
-    {
-        $this->isCron = $isCron;
-
-        return $this;
     }
 
     private function getLegendarySquadsFromView(){
@@ -194,20 +158,21 @@ class SquadController extends BaseController
 
 
     /**
-     * @return JsonResponse
+     * @return JsonResponse|null
      */
-    public function submitGuildMetaSquadsToGoogle(): JsonResponse
+    public function submitGuildMetaSquadsToGoogle()
     {
-        return $this->setSubmitToGoogle(true)
-            ->getGuildMetaSquads();
+        //return $this->setSendToGoogle(false)
+            //->getGuildMetaSquads();
+        SquadReportJob::dispatch();
     }
 
     /**
-     * @return JsonResponse
+     * @return JsonResponse|null
      */
-    public function submitGuildMetaSquadsToGoogleCron(): JsonResponse
+    public function submitGuildMetaSquadsToGoogleCron(): ?JsonResponse
     {
-        return $this->setSubmitToGoogle(true)
+        return $this->setSendToGoogle(true)
             ->setIsCron(true)
             ->getGuildMetaSquads();
     }
@@ -215,9 +180,9 @@ class SquadController extends BaseController
 
 
     /**
-     * @return JsonResponse
+     * @return JsonResponse|null
      */
-    public function returnGuildMetaSquads(): JsonResponse
+    public function returnGuildMetaSquads(): ?JsonResponse
     {
         return $this->setSubmitToGoogle(false)
             ->getGuildMetaSquads();
@@ -225,6 +190,7 @@ class SquadController extends BaseController
 
     /**
      * @return JsonResponse|null
+     * @deprecated Moved to Trait
      */
     public function getGuildMetaSquads(): ?JsonResponse
     {
@@ -300,11 +266,11 @@ class SquadController extends BaseController
             $data[] = ['','','','','',''];
         }
 
-        if ($this->getSubmitToGoogle() === true){
+        if ($this->getSubmitToGoogle()) {
             $this->sendToSheets($data);
         }
 
-        if ($this->getIsCron() === true){
+        if (!$this->getIsCron()) {
         return response()->json();
     }
 
@@ -314,6 +280,7 @@ class SquadController extends BaseController
     /**
      * @param $squad
      * @return array
+     * $deprecated Moved to trait
      */
     private function createSquadArray($squad): array
     {
@@ -328,11 +295,12 @@ class SquadController extends BaseController
 
     /**
      * @param $data
+     * @deprecated Moved to trait
      */
     private function sendToSheets($data): void
     {
-        $sheet = Sheets::spreadsheet('1D-baQNmzJNfUBArr7fpQC7m_hPCI7KMnAITHVqJyL9c')
-                    ->sheet('Squads');
+        $sheet = Sheets::spreadsheet(Constants::ID_GOOGLE_SHEET)
+                    ->sheet(Constants::NAME_SQUAD_SHEET);
 
         $sheet->update($data);
     }
