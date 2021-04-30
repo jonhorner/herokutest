@@ -32,6 +32,12 @@ trait GetterSetterTrait
      */
     private $isCron = false;
 
+    /**
+     * Types of squads to use
+     *
+     * @var array
+     */
+    private $squadTypes = [];
 
     /**
      * @return bool
@@ -107,5 +113,23 @@ trait GetterSetterTrait
         $this->useKeys = $useKeys;
 
         return $this;
+    }
+
+    /**
+     * @param bool $squadTypes
+     * @return GetterSetterTrait
+     */
+    public function setSquadTypes($squadTypes)
+    {
+        $this->squadTypes = $squadTypes;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSquadTypes(): array
+    {
+        return $this->squadTypes;
     }
 }
