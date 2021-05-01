@@ -54,7 +54,19 @@ return [
          * Path to service account json file. You can also pass the credentials as an array
          * instead of a file path.
          */
-        'file' => env('GOOGLE_SERVICE_ACCOUNT_JSON_LOCATION', storage_path('swgoh-1609335418872-b0263a029ca2.json')),
+        //'file' => env('GOOGLE_SERVICE_ACCOUNT_JSON_LOCATION', storage_path('swgoh-1609335418872-f0e4cba7e57f.json')),
+        'file' => [
+            "type" => env('GOOGLE_SERVICE_TYPE',''),
+            "project_id" => env('GOOGLE_SERVICE_PROJECT_ID', ''),
+            "private_key_id" => env('GOOGLE_SERVICE_PRIVATE_KEY_ID', ''),
+            "private_key" => env('GOOGLE_SERVICE_PRIVATE_KEY', ''),
+            "client_email" => env('GOOGLE_SERVICE_CLIENT_EMAIL', ''),
+            "client_id" => env('GOOGLE_SERVICE_CLIENT_ID', ''),
+            "auth_uri" => env('GOOGLE_SERVICE_AUTH_URI', ''),
+            "token_uri" => env('GOOGLE_SERVICE_TOKEN_URI', ''),
+            "auth_provider_x509_cert_url" => env('GOOGLE_SERVICE_AUTH_PROVIDER_X509_CERT_URL', ''),
+            "client_x509_cert_url" => env('GOOGLE_SERVICE_CLIENT_X509_CERT_URL', '')
+        ]
     ],
 
     /*
