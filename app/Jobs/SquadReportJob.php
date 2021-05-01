@@ -5,6 +5,7 @@ namespace App\Jobs;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Traits\SquadReportTrait;
@@ -47,10 +48,15 @@ class SquadReportJob implements ShouldQueue
     /**
      * Execute the job.
      *
-     * @return void
+     * @return null|JsonResponse
      */
-    public function handle()
+    public function handle(): ?JsonResponse
     {
-        $this->getGuildMetaSquads();
+        try {
+            $this->getGuildMetaSquads();
+        } catch (\Exception $e){
+            return response()->json($e);
+        }
+        return null;
     }
 }

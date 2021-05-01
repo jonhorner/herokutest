@@ -164,7 +164,7 @@ class SquadController extends BaseController
     {
         //return $this->setSendToGoogle(false)
             //->getGuildMetaSquads();
-        SquadReportJob::dispatch();
+        SquadReportJob::dispatch(false, false, true);
     }
 
     /**
