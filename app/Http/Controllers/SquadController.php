@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Constants\Constants;
 use App\Jobs\SquadReportJob;
+use App\Models\RaidSquad;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller as BaseController;
@@ -492,9 +493,41 @@ class SquadController extends BaseController
         $squad->delete();
 
         // redirect
-        // Session::flash('message', 'Successfully deleted the shark!');
         return Redirect::to('squad-builder');
     }
 
+    /**
+     * @param string $returnAs
+     * @return JsonResponse
+     */
+    public function getCrancorSquads(String $returnAs='')
+    {
+        $squads = RaidSquad::with('squads')
+            ->where('raid_name_id', '=', '5')
+            ->orderBy('phase')
+            ->get();
+
+        if (strtolower($returnAs) === 'json') {
+            return response()->json($squads);
+        }
+
+        return $squads;
+    }
+
+    /**
+     * @return array
+     */
+    public function hasCrancorSquads(): array
+    {
+        $raids = $this->getCrancorSquads();
+
+        foreach ($raids as $raid) {
+            foreach ($raid->squads as $squad) {
+                $squads[$squad->name][] = $this->getPlayersWithFullSquad($squad, 'crancor');
+            }
+        }
+
+        return $squads;
+    }
 
 }

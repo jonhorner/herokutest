@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @method static where(string $string, $id)
+ * @method relic()
+ * @method crancor()
  */
 class SwGuildMembersRoster extends Model
 {
@@ -17,6 +19,11 @@ class SwGuildMembersRoster extends Model
     public function scopeRelic($query)
     {
         return $query->where('tier', '=', 13);
+    }
+
+    public function scopeCrancor($query)
+    {
+        return $query->where('relic', '>=', 5);
     }
 
     public function scopeMingear($query)

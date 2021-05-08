@@ -56,7 +56,9 @@ Route::get('/report/google-report-with-keys', [MetaController::class, 'googleRep
 Route::get('/report/squads', [SquadController::class, 'returnGuildMetaSquads']);
 Route::get('/report/google-squad-report', [SquadController::class, 'submitGuildMetaSquadsToGoogle']);
 
-
+/**
+ * API routes for squad data
+ */
 Route::get('/meta-squads', [SquadController::class, 'getAll']);
 Route::get('/squads/all', [SquadController::class, 'getAll']);
 //Route::get('/guild-squad-report', [SquadController::class, 'returnGuildMetaSquads']);
@@ -65,3 +67,8 @@ Route::put('/squads/update/{id?}', [SquadController::class, 'store']);
 Route::delete('/squad-builder/{id}', [SquadController::class, 'destroy']);
 Route::get('/squads/getform', [SquadController::class, 'returnSquadForm']);
 Route::get('/squads/get/{id}', [SquadController::class, 'getOne']);
+
+/**
+ * API routes for custom reports
+ */
+Route::get('/squads/crancor/all', [SquadController::class, 'hasCrancorSquads']);
