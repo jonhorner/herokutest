@@ -10,11 +10,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class SwUnitData extends Model
 {
-    // protected $connection = 'sqlite';
 
     protected $fillable = ['thumbnailName','baseId','nameKey','combatType'];
-
-    public $timestamps = false;
 
     public function scopeShips($query)
     {
