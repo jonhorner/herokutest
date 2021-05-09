@@ -71,4 +71,5 @@ Route::get('/squads/get/{id}', [SquadController::class, 'getOne']);
 /**
  * API routes for custom reports
  */
-Route::get('/squads/crancor/all', [SquadController::class, 'hasCrancorSquads']);
+Route::get('/squads/crancor/all', [SquadController::class, 'getPlayersWithCrancorSquads']);
+Route::get('/squads/crancor/phases', [SquadController::class, 'getPlayersWithCrancorSquadsByPhase']);

@@ -6,6 +6,7 @@ namespace App\Models;
 
 use \Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Class RaidSquad
@@ -40,6 +41,18 @@ class RaidSquad extends Model
     public function squads(): HasMany
     {
         return $this->hasMany(
+            SwGuildSquad::class,
+            'id',
+            'sw_guild_squads_id'
+        );
+    }
+
+    /**
+     * @return HasOne
+     */
+    public function squadDetails(): HasOne
+    {
+        return $this->hasOne(
             SwGuildSquad::class,
             'id',
             'sw_guild_squads_id'

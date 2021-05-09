@@ -336,24 +336,42 @@ class SquadController extends BaseController
 
     /**
      * @param $squad
+     * @param string $scope (relic|crancor)
      * @return array
      */
-    private function getPlayersWithFullSquad($squad): array
+    private function getPlayersWithFullSquad($squad, $scope='relic'): array
     {
-
-        $guildmembers = (new GuildController)->getGuildMembersFromDB();
+        $guildmembers = (new MemberController())->getAll('collection');
 
         $squad = $squad->makeHidden(['name']);
-        // var_dump($squad->count);
 
-        $squadArray = [$squad->p1,$squad->p2,$squad->p3,$squad->p4,$squad->p5];
-        // var_dump($squadArray);
-        $squadMatches = [];
+        $matchedUsers = [];
 
         foreach ($guildmembers as $guildmember) {
-            // var_dump($guildmember->id);
 
-            $team =  (new SwGuildMembersRoster)->relic()
+            switch ($scope){
+                case 'relic' :
+                    $team = $this->countRelicMembers($squad, $guildmember);
+                    break;
+                case 'crancor' :
+                    $team = $this->countCrancorMembers($squad, $guildmember);
+                    break;
+                default :
+                    $team = null;
+                    break;
+            }
+
+            if ((int)$team === 5) {
+                $matchedUsers[] = $guildmember->username;
+            }
+        }
+
+        return $matchedUsers;
+    }
+
+    private function countRelicMembers($squad, $guildmember)
+    {
+        return (new SwGuildMembersRoster)->relic()
                 ->where('sw_guild_member_id', '=', $guildmember->id)
                 ->where(function($query) use ($squad)
                 {
@@ -364,18 +382,21 @@ class SquadController extends BaseController
                           ->orWhere('defId', '=', $squad->p5);
                 })
                 ->count();
-
-            // var_dump($team);
-
-            if ((int)$team === 5) {
-                // var_dump($guildmember->username);
-                $squadMatches[] = $guildmember->username;
-            }
-
         }
 
-        return $squadMatches;
-
+    private function countCrancorMembers($squad, $guildmember)
+    {
+        return (new SwGuildMembersRoster)->crancor()
+            ->where('sw_guild_member_id', '=', $guildmember->id)
+            ->where(function($query) use ($squad)
+            {
+                $query->where('defId', '=', $squad->p1)
+                    ->orWhere('defId', '=', $squad->p2)
+                    ->orWhere('defId', '=', $squad->p3)
+                    ->orWhere('defId', '=', $squad->p4)
+                    ->orWhere('defId', '=', $squad->p5);
+            })
+            ->count();
     }
 
     /**
@@ -498,14 +519,18 @@ class SquadController extends BaseController
 
     /**
      * @param string $returnAs
-     * @return JsonResponse
+     * @param string $groupBy DB column to group results on
+     * @return JsonResponse|RaidSquad
      */
-    public function getCrancorSquads(String $returnAs='')
+    public function getCrancorSquads(string $returnAs='', string $groupBy='')
     {
         $squads = RaidSquad::with('squads')
             ->where('raid_name_id', '=', '5')
-            ->orderBy('phase')
-            ->get();
+            ->orderBy('phase')->get();
+
+        if ($groupBy !== '') {
+            $squads = $squads->groupBy($groupBy);
+        }
 
         if (strtolower($returnAs) === 'json') {
             return response()->json($squads);
@@ -517,17 +542,36 @@ class SquadController extends BaseController
     /**
      * @return array
      */
-    public function hasCrancorSquads(): array
+    public function getPlayersWithCrancorSquads(): array
     {
-        $raids = $this->getCrancorSquads();
+        $squads = $this->getCrancorSquads();
+        $squadDetails = [];
 
-        foreach ($raids as $raid) {
-            foreach ($raid->squads as $squad) {
-                $squads[$squad->name][] = $this->getPlayersWithFullSquad($squad, 'crancor');
+        foreach ($squads as $raidSquad) {
+            foreach ($raidSquad->squads as $squad) {
+                $squadDetails[$squad->name][] = $this->getPlayersWithFullSquad($squad, 'crancor');
             }
         }
 
-        return $squads;
+        return $squadDetails;
+    }
+
+    public function getPlayersWithCrancorSquadsByPhase(): array
+    {
+        $phases = $this->getCrancorSquads('collection', 'phase');
+        $raidData = [];
+        foreach ($phases as $phase){
+            $phaseData = [];
+            foreach ($phase as $squad) {
+                //$squadData = [];
+                $item = $squad->squadDetails;
+                $squadData = $this->getPlayersWithFullSquad($item, 'crancor');
+                $phaseData[$item->name] = $squadData;
+                $phaseNo = $squad->phase;
+            }
+            $raidData[$phaseNo] = $phaseData;
+        }
+        return $raidData;
     }
 
 }
