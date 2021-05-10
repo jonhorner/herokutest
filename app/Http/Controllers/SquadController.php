@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Constants\Constants;
 use App\Jobs\SquadReportJob;
+use App\Models\RaidSquad;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller as BaseController;
@@ -86,22 +87,16 @@ class SquadController extends BaseController
     }
 
     private	function getSquadsFromView(){
-
-        $squads = ViewGuildSquad::all()
+        return ViewGuildSquad::all()
             ->sortBy('ordering')
             ->sortBy('priority');
-
-    	return $squads;
     }
 
     private function getLegendarySquadsFromView(){
-
-        $legends = ViewGuildSquad::whereIn('priority', [1,2])
+        return ViewGuildSquad::whereIn('priority', [1,2])
                     ->orderBy('priority')
                     ->orderBy('ordering')
                     ->get();
-
-        return $legends;
     }
 
     private function getSquads()
@@ -335,24 +330,43 @@ class SquadController extends BaseController
 
     /**
      * @param $squad
+     * @param string $scope (relic|crancor)
      * @return array
      */
-    private function getPlayersWithFullSquad($squad): array
+    public function getPlayersWithFullSquad($squad, $scope='relic'): array
     {
-
-        $guildmembers = (new GuildController)->getGuildMembersFromDB();
+        $guildmembers = (new MemberController())->getAll('collection');
 
         $squad = $squad->makeHidden(['name']);
-        // var_dump($squad->count);
 
-        $squadArray = [$squad->p1,$squad->p2,$squad->p3,$squad->p4,$squad->p5];
-        // var_dump($squadArray);
-        $squadMatches = [];
+        $matchedUsers = [];
 
         foreach ($guildmembers as $guildmember) {
-            // var_dump($guildmember->id);
 
-            $team =  (new SwGuildMembersRoster)->relic()
+            switch ($scope){
+                case 'relic' :
+                    $team = $this->countRelicMembers($squad, $guildmember);
+                    break;
+                case 'crancor' :
+                    $getRaidReport = new GetRaidReport();
+                    $team = $getRaidReport->countCrancorMembers($squad, $guildmember);
+                    break;
+                default :
+                    $team = null;
+                    break;
+            }
+
+            if ((int)$team === 5) {
+                $matchedUsers[] = $guildmember->username;
+            }
+        }
+
+        return $matchedUsers;
+    }
+
+    private function countRelicMembers($squad, $guildmember)
+    {
+        return (new SwGuildMembersRoster)->relic()
                 ->where('sw_guild_member_id', '=', $guildmember->id)
                 ->where(function($query) use ($squad)
                 {
@@ -363,19 +377,12 @@ class SquadController extends BaseController
                           ->orWhere('defId', '=', $squad->p5);
                 })
                 ->count();
-
-            // var_dump($team);
-
-            if ((int)$team === 5) {
-                // var_dump($guildmember->username);
-                $squadMatches[] = $guildmember->username;
-            }
-
         }
 
-        return $squadMatches;
-
-    }
+//    private function countCrancorMembers($squad, $guildmember)
+//    {
+//        return $this->getRaidReport->countCrancorMembers($squad, $guildmember);
+//    }
 
     /**
      * $return Response
@@ -492,9 +499,9 @@ class SquadController extends BaseController
         $squad->delete();
 
         // redirect
-        // Session::flash('message', 'Successfully deleted the shark!');
         return Redirect::to('squad-builder');
     }
+
 
 
 }
