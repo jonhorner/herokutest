@@ -43,15 +43,20 @@ class MemberController extends BaseController
 
 
     /**
-     * @return JsonResponse
+     * @param string $returnAs
+     * @return JsonResponse|SwGuildMember
      */
-    public function getAll(): JsonResponse
+    public function getAll($returnAs='json')
     {
         $members =  SwGuildMember::where('active','1')
             ->orderBy('username')
             ->get();
 
-        return response()->json($members);
+        if (strtolower($returnAs) === 'json') {
+            return response()->json($members);
+        }
+
+        return $members;
     }
 
     /**
