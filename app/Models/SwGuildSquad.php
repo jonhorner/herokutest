@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static find($id)
  * @method static where(string $string, mixed $get)
  * @method static ofType(int $type)
+ * @method static has(string $string)
  */
 class SwGuildSquad extends Model
 {
@@ -29,6 +30,18 @@ class SwGuildSquad extends Model
     public function type(): BelongsTo
     {
         return $this->belongsTo(SwSquadType::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function raidSquad(): BelongsTo
+    {
+        return $this->belongsTo(
+            RaidSquad::class,
+            'id',
+            'sw_guild_squads_id'
+        );
     }
 
     /**

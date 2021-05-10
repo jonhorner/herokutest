@@ -15,6 +15,11 @@ class Constants
     public const ID_CRANCOR_SQUAD = 2;
 
     /**
+     * Raids
+     */
+    public const ID_RAID_CHALLENGE_RANCOR = '5';
+
+    /**
      * Meta Report
      */
     public const GALACTIC_LEGENDS = ['GLREY','SUPREMELEADERKYLOREN','GRANDMASTERLUKE','SITHPALPATINE'];
