@@ -13,7 +13,7 @@ class SwGuildMembersRoster extends Model
 {
     // protected $connection = 'sqlite';
 
-    protected $fillable = ['sw_guild_member_id','defId','relic','tier','stars','level'];
+    protected $fillable = ['sw_guild_member_id', 'defId', 'relic', 'tier', 'stars', 'level', 'gp', 'skills'];
 
 
     public function scopeRelic($query)

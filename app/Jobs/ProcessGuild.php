@@ -72,7 +72,6 @@ class ProcessGuild implements ShouldQueue
                         if($roster){
                             // dd($roster);
                             foreach ($roster as $unit) {
-
                                 // Relic tiers are enums- convert them to real values
                                 $tierLevel = $unit['relic']['currentTier'] ??  0;
 
@@ -100,6 +99,8 @@ class ProcessGuild implements ShouldQueue
                                         'level' => $unit['level'],
                                         'stars' => $unit['rarity'],
                                         'relic' => $unit['relic']['currentTier'],
+                                        'gp'    => $unit['gp'],
+                                        'skills' => json_encode($unit['skills'])
                                     ]
                                 );
                             }
